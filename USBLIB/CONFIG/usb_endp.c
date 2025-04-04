@@ -26,7 +26,7 @@
 uint8_t USBD_Endp3_Busy = 0;
 
 /* 256 bytes */
-uint8_t	USBSerialRxBuffer[DEF_USBD_MAX_PACK_SIZE * 4] = {0,};
+uint8_t	USBSerialRxBuffer[DEF_USBD_MAX_PACK_SIZE * DEF_USBD_MAX_PACK_SIZE] = {0,};
 uint16_t USBSerialRxSP = 0, USBSerialRxEP = 0;
 
 /*---------------------------------------------------------------------------*/
@@ -52,6 +52,7 @@ void USBSerialRxBufferWrite (uint8_t *buf, uint16_t len)
 /*---------------------------------------------------------------------------*/
 void USBSerial_flush (void)
 {
+	USBSerialRxSP = USBSerialRxEP;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -78,7 +79,7 @@ uint16_t USBSerial_available (void)
 /*---------------------------------------------------------------------------*/
 uint16_t USBSerial_print (char *fmt, ...)
 {
-	uint8_t buf [DEF_USBD_MAX_PACK_SIZE * 2];
+	uint8_t buf [DEF_USBD_MAX_PACK_SIZE];
 	va_list va;
 	uint16_t len;
 
@@ -129,7 +130,7 @@ void EP1_IN_Callback (void)
 void EP2_OUT_Callback (void)
 {
 	uint32_t len;
-	uint8_t buf[64];
+	uint8_t buf[DEF_USBD_MAX_PACK_SIZE];
 
 	len = GetEPRxCount ( EP2_OUT & 0x7F );
 	PMAToUserBufferCopy ( buf, GetEPRxAddr( EP2_OUT & 0x7F ), len );

@@ -93,6 +93,7 @@ void setup() {
 
     USBSerial_print ("*** Serial input ready ***\r\n");
     //watchdog_setup (WDT_RELOAD_3_2_S)
+    USBSerial_print ("%s EPD partial init status = %d\r\n", __func__, epd_init_partial ());
 }
 
 /*---------------------------------------------------------------------------*/
@@ -109,10 +110,13 @@ void loop() {
 
     /* serial data read & write check(ttyACM) */
     if (protocol_data_check (epd_fb)) {
-        DisplayMode = eMODE_EDIT_SCREEN;
+        if (DisplayMode != eMODE_EDIT_SCREEN) {
+            // exit sleep mode
+            epd_init_partial ();
+            DisplayMode = eMODE_EDIT_SCREEN;
+        }
         display_update (epd_fb, DisplayMode, 1);
     }
-
     /* lt8619c check loop (1 sec) */
     if (MillisCheck + PERIOD_MAIN_LOOP < millis()) {
         blink_status_led ();
@@ -120,7 +124,9 @@ void loop() {
         if (digitalRead (PORT_ADC_KEY))
             DisplayMode = (DisplayMode + 1) % eMODE_END;
 
-        display_update (epd_fb, DisplayMode, digitalRead (PORT_ADC_KEY));
+        if (DisplayMode != eMODE_EDIT_SCREEN)
+            display_update (epd_fb, DisplayMode, digitalRead (PORT_ADC_KEY));
+
         MillisCheck = millis();
     }
 }

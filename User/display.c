@@ -186,6 +186,7 @@ void display_clear_screen (fb_info_t *pfb)
     epd_deep_sleep (1);
 }
 
+/*---------------------------------------------------------------------------*/
 void display_user_screen (fb_info_t *pfb, char mode)
 {
     USBSerial_print ("%s EPD partial init status = %d\r\n", __func__, epd_init_partial ());
@@ -205,13 +206,10 @@ void display_user_screen (fb_info_t *pfb, char mode)
 }
 #endif
 
+/*---------------------------------------------------------------------------*/
 void display_edit_screen (fb_info_t *pfb)
 {
-    USBSerial_print ("%s EPD partial init status = %d\r\n", __func__, epd_init_partial ());
     epd_update_partial(pfb->data, pfb->size);
-
-    epd_update_partial(pfb->data, pfb->size);
-    epd_deep_sleep (1);
 }
 
 /*---------------------------------------------------------------------------*/

@@ -28,6 +28,26 @@ unsigned char PDataStart = 0;
 unsigned int PDataCount = 0;
 
 /*---------------------------------------------------------------------------*/
+#define LINE_TEXT_SIZE  37
+#define DEFAULT_FONT_W  8
+#define DEFAULT_FONT_H  16
+
+/*---------------------------------------------------------------------------*/
+void parse_page_msg (fb_info_t *pfb, char *ptr)
+{
+    char line [LINE_TEXT_SIZE +2];
+    int i;
+
+    fb_clear  (pfb);
+    for (i = 0; i < 8; i++) {
+        memset (line, 0, sizeof(line));
+        memcpy (&line[0], &ptr [2 + i * LINE_TEXT_SIZE], LINE_TEXT_SIZE);
+        draw_text (pfb, 0, i * DEFAULT_FONT_H, 1, 0, 1, line);
+    }
+    USBSerial_flush ();
+}
+
+/*---------------------------------------------------------------------------*/
 void parse_text_msg (fb_info_t *pfb, char *ptr)
 {
     int x = 0, y = 0, f = 0, b = 0, s = 0;
@@ -142,6 +162,7 @@ char protocol_data_parse (fb_info_t *pfb, char *p)
 
     if (ptr != NULL) {
         switch (*ptr) {
+            case 'p':   parse_page_msg  (pfb, ptr); break;
             case 'm':   parse_text_msg  (pfb, ptr); break;
             case 't':   parse_time_msg  (ptr);      break;
             case 'b':   parse_bits_msg  (pfb, ptr); break;
